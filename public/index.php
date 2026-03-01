@@ -4,13 +4,6 @@ require __DIR__ . "/../vendor/autoload.php";
 
 use App\Auth\JWTManager;
 use Slim\Factory\AppFactory;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
-
-use App\Middleware\AuthMiddleware;
-
-use App\Controllers\UserController;
-use App\Helpers\ResponseHelper;
 
 Dotenv\Dotenv::createImmutable(__DIR__ . '/..')->load();
 
@@ -36,16 +29,6 @@ $app->add(function ($request, $handler) {
 });
 
 
-
-/* 
-
-Add pagination capabilities 
-
-Add rate limiting via server (!IMPORTANT)
-
-Add real verification of posts later
-
-*/
 
 
 /* $app->group('/admin', function ($group) {
@@ -196,51 +179,6 @@ Add real verification of posts later
 
 $app->get('/', \App\Controllers\UserController::class . ':base');
 
-
-
-
-/* $app->get('/blog', function (Request $request, Response $response){
-
-    $controller = new PostController();
-
-    $posts = $controller->latest(5);
-
-    //only fetching the latest posts we recieve basic info
-    //so no need to decode stored jsons of content and tags
-
-    return ResponseHelper::success(
-        "success",
-        200,
-        $posts
-    );
-
-});
-
-
-
-$app->get('/blog/{slug}', function (Request $request, Response $response, array $args){
-
-    $slug = $args["slug"];
-    $controller = new PostController();
-    $post = $controller->getPostBySlug($slug);
-
-    if($post == null){
-        return ResponseHelper::notFound();
-    };
-    
-    // Decode the JSON string into a PHP structure
-    // its needed to have this as an array so the later json encode
-    // takes care and encodes only once correctly for the client
-    $post->content = json_decode($post->content);
-    
-    return ResponseHelper::success(
-        "success",
-        200,
-        [$post]
-    );
-
-});
- */
 
 
 $app->run();
