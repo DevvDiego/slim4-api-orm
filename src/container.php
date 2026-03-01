@@ -28,6 +28,8 @@ $builder->addDefinitions([
         return $capsule;
     },
 
+
+    Capsule::class => DI\get('db'),
 ]);
 
 return $builder->build();
