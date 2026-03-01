@@ -9,12 +9,15 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 use App\Middleware\AuthMiddleware;
 
-use App\Controllers\PostController;
+use App\Controllers\UserController;
 use App\Helpers\ResponseHelper;
 
 Dotenv\Dotenv::createImmutable(__DIR__ . '/..')->load();
 
 
+$container = require __DIR__ . "/../src/container.php";
+
+AppFactory::setContainer($container);
 $app = AppFactory::create();
 
 // $app->setBasePath('');
@@ -45,7 +48,7 @@ Add real verification of posts later
 */
 
 
-$app->group('/admin', function ($group) {
+/* $app->group('/admin', function ($group) {
 
 
 
@@ -156,11 +159,11 @@ $app->group('/admin', function ($group) {
 
 
 })->add( new AuthMiddleware( new JWTManager( $_ENV["JWT_SECRET"] ) ) ); // Middleware aplicado a TODO el grupo
-
+ */
 
 // take care of more than an admin user? or keep it simple and keep it as is
 
-$app->post('/login', function (Request $request, Response $response) {
+/* $app->post('/login', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $password = $data['password'] ?? '';
     
@@ -188,13 +191,15 @@ $app->post('/login', function (Request $request, Response $response) {
         ],
     );
 
-});
+}); */
+
+
+$app->get('/', \App\Controllers\UserController::class . ':base');
 
 
 
 
-
-$app->get('/blog', function (Request $request, Response $response){
+/* $app->get('/blog', function (Request $request, Response $response){
 
     $controller = new PostController();
 
@@ -235,7 +240,7 @@ $app->get('/blog/{slug}', function (Request $request, Response $response, array 
     );
 
 });
-
+ */
 
 
 $app->run();
