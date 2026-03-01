@@ -1,28 +1,33 @@
 <?php
 
 use DI\ContainerBuilder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 $builder = new ContainerBuilder();
 
 $builder->addDefinitions([
     
-    PDO::class => function(){
-        $host = $_ENV["DB_HOST"];
-        $dbname = $_ENV["DB_NAME"];
-        $user = $_ENV["DB_USER"];
-        $pass = $_ENV["DB_PASS"];
+    'db' => function () {
+        $capsule = new Capsule;
 
-        return new PDO(
-            "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
-            $user,
-            $pass,
-            [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false
-            ]
-        );
+        $capsule->addConnection([
+            'driver'    => 'mysql',
+            'host'      => $_ENV['DB_HOST'],
+            'database'  => $_ENV['DB_NAME'],
+            'username'  => $_ENV['DB_USER'],
+            'password'  => $_ENV['DB_PASS'],
+            'charset'   => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix'    => '',
+        ]);
+
+        //Instance conn as "static" so can be accessed anywhere
+        $capsule->setAsGlobal();
+        $capsule->bootEloquent();
+
+        return $capsule;
     },
+
 ]);
 
 return $builder->build();
