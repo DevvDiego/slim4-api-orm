@@ -14,7 +14,7 @@ class UserController {
     public function __construct(Capsule $db) {}
 
     public function showUser(Request $request, Response $response, $args) {
-        $user = \App\Models\User::find($args["id"]);
+        $user = \App\Models\User::query()->find($args["id"]);
 
         if (!$user) {
             return $this->error($response, "Usuario no encontrado", 404);
