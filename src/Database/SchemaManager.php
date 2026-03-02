@@ -6,6 +6,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use App\Database\Schemas\UserSchema;
+use App\Database\Schemas\CustomerSchema;
+use App\Database\Schemas\TicketSchema;
 use App\Traits\ResponseTrait;
 
 class SchemaManager {
@@ -18,25 +20,27 @@ class SchemaManager {
 
     public function sync(Request $request, Response $response, array $args): Response {
         $this->db::schema()->disableForeignKeyConstraints();
+        $createdTables = [];
 
         try {
             
             $tables = [
                 'users'=> UserSchema::class,
-                /*'customers' => CustomerSchema::class,
-                'tickets'   => TicketSchema::class,*/
+                'customers' => CustomerSchema::class,
+                'tickets'   => TicketSchema::class,
             ];
 
             foreach ($tables as $name => $class) {
                 if ( !$this->db::schema()->hasTable($name) ) {
                     $class::create();
+                    $createdTables[$name] = $name;
                 }
             }
 
             // If there were any evolutions, update the tables then
             $this->updateTables();
 
-            return $this->success($response, "Tables generated correctly");
+            return $this->success($response, "The following tables were created: " . implode(",", $createdTables) );
 
         } catch (\Exception $e) {
             return $this->error($response, "Error creating tables: " . $e->getMessage(), 500);
