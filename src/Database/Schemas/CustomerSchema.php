@@ -8,7 +8,7 @@ use \Illuminate\Database\Schema\Blueprint as Blueprint;
 class CustomerSchema {
 
     public static function create() {
-        Capsule::schema()->create('tickets', function (Blueprint $table) {        
+        Capsule::schema()->create('customers', function (Blueprint $table) {        
             $table->id();
             $table->string("company_name");
             $table->string("contact_person");
