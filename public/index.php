@@ -177,8 +177,12 @@ $app->add(function ($request, $handler) {
 }); */
 
 
-$app->get('/', \App\Controllers\UserController::class . ':base');
+/* $app->get('/users/{id}', \App\Controllers\UserController::class . ':showUser');
 
+$app->get('/tickets/{id}', \App\Controllers\TicketController::class . ':showTicket');
+ */
+
+$app->get('/db', \App\Database\SchemaManager::class . ":sync");
 
 
 $app->run();
