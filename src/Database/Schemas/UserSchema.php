@@ -9,10 +9,11 @@ class UserSchema {
 
     public static function create() {
         Capsule::schema()->create('users', function (Blueprint $table) {        
-            $table->id('user_id');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password_hash');
+            $table->id();
+            $table->string("name");
+            $table->string("email")->unique();
+            $table->string("password");
+            $table->string("role");
             $table->timestamps();
         });
 

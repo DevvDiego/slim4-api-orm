@@ -5,14 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class User extends Model {
-    protected $table = "users";
-    protected $primaryKey = "user_id";
-    public $timestamps = false; // use if sql has columns created_at/updated_at
+    // Eloquent looks for plural user (users) by default 
+    //protected $table = "users";
 
-    protected $hidden = ["password_hash"];
+    // Eloquent looks for "id" by default
+    //protected $primaryKey = "id";
 
-    // enable massive fill of fields
-    protected $fillable = ["name", "email", "role", "password_hash"];
+    // Eloquent by default sets timestamps by default
+    //public $timestamps = true; 
+
+    protected $hidden = ["password"];
+
+    protected $fillable = [
+        "name", 
+        "email", 
+        "role", 
+        "password"
+    ];
 }
 
 ?>
