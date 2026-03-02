@@ -20,10 +20,18 @@ class SchemaManager {
         $this->db::schema()->disableForeignKeyConstraints();
 
         try {
-            // create all tables first
-            UserSchema::create();
-            /* CustomerSchema::create();
-            TicketSchema::create(); */
+            
+            $tables = [
+                'users'=> UserSchema::class,
+                /*'customers' => CustomerSchema::class,
+                'tickets'   => TicketSchema::class,*/
+            ];
+
+            foreach ($tables as $name => $class) {
+                if ( !$this->db::schema()->hasTable($name) ) {
+                    $class::create();
+                }
+            }
 
             // If there were any evolutions, update the tables then
             $this->updateTables();
