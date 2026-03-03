@@ -2,6 +2,8 @@
 
 use DI\ContainerBuilder;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Psr\Container\ContainerInterface;
+use \App\Auth\JWTManager as JWTManager;
 
 $builder = new ContainerBuilder();
 
@@ -28,6 +30,10 @@ $builder->addDefinitions([
         return $capsule;
     },
 
+    JWTManager::class => function (ContainerInterface $c){
+        $secret = $_ENV['JWT_SECRET'];
+        return new JWTManager($secret);
+    },
 
     Capsule::class => DI\get('db'),
 ]);

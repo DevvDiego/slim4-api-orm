@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Auth\JWTManager;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -10,8 +11,11 @@ use App\Traits\ResponseTrait;
 
 class AuthController {
     use ResponseTrait;
+    private JWTManager $jwt;
 
-    public function __construct(Capsule $db) {}
+    public function __construct(Capsule $db, JWTManager $jwt) {
+        $this->jwt = $jwt;
+    }
 
     public function login(Request $request, Response $response, $args) {
         $data = $request->getParsedBody();
@@ -29,8 +33,7 @@ class AuthController {
 
         }
 
-        $jwtManager = new \App\Auth\JWTManager($_ENV["JWT_SECRET"]);
-        $token = $jwtManager->createToken($user);
+        $token = $this->jwt->createToken($user);
 
         return $this->success(
             res:$response,

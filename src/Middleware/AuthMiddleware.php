@@ -3,17 +3,17 @@ namespace App\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
+use \App\Auth\JWTManager as JWTManager;
 use Slim\Psr7\Response;
 
 use App\Traits\ResponseTrait;
 
 class AuthMiddleware{
     use ResponseTrait;
-    private $jwtManager;
-    
-    public function __construct(\App\Auth\JWTManager $jwtManager){
-        $this->jwtManager = $jwtManager;
+    private JWTManager $jwt;
 
+    public function __construct(JWTManager $jwt) {
+        $this->jwt = $jwt;
     }
     
     public function __invoke(Request $request, Handler $handler): Response{
@@ -29,7 +29,7 @@ class AuthMiddleware{
         $token = $matches[1];
         
         // Validar el token
-        $payload = $this->jwtManager->validateToken($token);
+        $payload = $this->jwt->validateToken($token);
         if (!$payload) {
             return $this->unauthorized('Invalid or expired token');
 
