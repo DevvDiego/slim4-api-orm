@@ -25,13 +25,11 @@ class ValidationMiddleware{
         }
 
         if ( !empty($errors) ) {
-
             return $this->error(
-                new Response(),
-                $errors,
-                "Failed validation"
+                res:new Response(), 
+                msg:"Failed validation",
+                data:$errors
             );
-
         }
 
         // if everything is ok, keep going with any other middleware

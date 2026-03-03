@@ -43,11 +43,17 @@ class SchemaManager {
             $message = "Tables created: " . implode(", ", $createdTables);
             $message .= ". Applied $updatesCount new columns";
 
-            return $this->success($response, $message);
+            return $this->success(
+                res:$response, 
+                msg:$message,
+            );
 
         } catch (\Exception $e) {
-            return $this->error($response, "Error creating tables: " . $e->getMessage(), 500);
-            
+            return $this->error(
+                res:$response, 
+                msg:"Error creating tables: " . $e->getMessage(),
+                code:500
+            );
         } finally {
             //this always executes even after the return inside try or catch
             $this->db::schema()->enableForeignKeyConstraints();
