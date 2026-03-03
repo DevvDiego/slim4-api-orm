@@ -10,14 +10,34 @@ use App\Traits\ResponseTrait;
 class UserController {
     use ResponseTrait;
 
-    // nothing here, just sets the dependency of the db
+    // Set the dependency of the db
     public function __construct(Capsule $db) {}
 
-    public function showUser(Request $request, Response $response, $args) {
+    public function new(Request $request, Response $response){
+        $data = $request->getParsedBody();
+
+        $user = \App\Models\User::query()->firstOrCreate(
+            ["email" => $data["email"]], // the unique field
+            [
+                "name" => $data["name"], 
+                "password" => password_hash($data["password"], PASSWORD_BCRYPT),
+                "role" => $data["role"]
+            ]
+        );
+
+        if ($user->wasRecentlyCreated) {
+            return $this->success(res:$response, msg:"User created successfully", code:201);
+        }
+
+        return $this->error(res:$response, msg:"User already exists", code:409);
+
+    }
+
+    public function showById(Response $response, $args) {
         $user = \App\Models\User::query()->find($args["id"]);
 
         if (!$user) {
-            return $this->error($response, "Usuario no encontrado", 404);
+            return $this->error(res:$response, msg:"User nor found", code:404);
         }
 
         return $this->success($response, $user);
