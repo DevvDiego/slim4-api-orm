@@ -6,36 +6,44 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 trait ResponseTrait {
 
-    private function createResponse(
-        Response $response,
-        bool $success,
-        string $message,
-        int $statusCode,
-        mixed $data = null
+    private function json(
+        Response $res, 
+        int $status, 
+        array $payload
     ): Response {
-        
-        $responseData = [
-            "success" => $success,
-            "message" => $message,
-            "data" => $data
-        ];
-        
-        $response->getBody()->write(json_encode($responseData));
-        
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus($statusCode);
+        $res->getBody()->write(json_encode($payload));
+
+        return $res->withHeader('Content-Type', 'application/json')
+                   ->withStatus($status);
     }
 
-    public function success(Response $res, $data = null, $msg = "success") {
-        return $this->createResponse($res, true, $msg, 200, $data);
+    public function success(
+        Response $res, 
+        mixed $data = null, 
+        string $msg = "Success", 
+        int $code = 200
+    ): Response {
+
+        return $this->json($res, $code, [
+            "success" => true,
+            "message" => $msg,
+            "data"    => $data
+        ]);
+
     }
 
-    public function created(Response $res, $data = null) {
-        return $this->createResponse($res, true, "Created successfully", 201, $data);
-    }
+    public function error(
+        Response $res, 
+        mixed $data = null, 
+        string $msg = "Success", 
+        int $code = 200
+    ): Response {
 
-    public function error(Response $res, $msg = "error", $code = 400) {
-        return $this->createResponse($res, false, $msg, $code);
+        return $this->json($res, $code, [
+            "success" => false,
+            "message" => $msg,
+            "data"    => $data
+        ]);
+
     }
 }
