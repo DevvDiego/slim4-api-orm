@@ -38,9 +38,12 @@ class SchemaManager {
             }
 
             // If there were any evolutions, update the tables then
-            $this->updateTables();
+            $updatesCount = $this->updateTables();
 
-            return $this->success($response, "The following tables were created: " . implode(",", $createdTables) );
+            $message = "Tables created: " . implode(", ", $createdTables);
+            $message .= ". Applied $updatesCount new columns";
+
+            return $this->success($response, $message);
 
         } catch (\Exception $e) {
             return $this->error($response, "Error creating tables: " . $e->getMessage(), 500);
@@ -54,36 +57,41 @@ class SchemaManager {
     /**
      * Any new fields must be added here to keep track of them more easily
      */
-    private function updateTables() {
-        
-        /* $this->alter('users', 'phone', function($table) {
-            $table->string('phone', 20)->nullable();
-        });
+    private function updateTables(): int {
+        $updatesCount = 0;
 
-        $this->alter('customers', 'address', function($table) {
-            $table->text('address')->nullable();
+        // we cast the bool given by alter, if its true casts to 1, therefore
+        // adds one to the count
+        /* $updatesCount += (int) $this->alter('users', 'phone', function($table) {
+            $table->string('phone', 20)->nullable();
         }); */
 
+        return $updatesCount;
     }
 
     /**
      * Checks if table and row exists before applying other methods on it
      */
     private function alter(string $tableName, string $columnName, callable $callback): bool {
-
-        if ($this->db::schema()->hasTable($tableName) && 
-            !$this->db::schema()->hasColumn($tableName, $columnName)) 
-        {
-            // give control to the callback
-            $this->db::schema()->table($tableName, function ($table) use ($callback) {
-                $callback($table);
-            });
-            
-            return true;
+        
+        // if theres no table dont modify anything
+        if( !$this->db::schema()->hasTable($tableName) ){
+            return false;
         }
 
-        return false;
+        // if the column already exists, dont rewrite it
+        if( $this->db::schema()->hasColumn($tableName, $columnName) ){
+            return false;
+        }
+
+        // give control to the callback
+        $this->db::schema()->table($tableName, function ($table) use ($callback) {
+            $callback($table);
+        });
+        
+        return true;
     }
+
 }
 
 ?>
