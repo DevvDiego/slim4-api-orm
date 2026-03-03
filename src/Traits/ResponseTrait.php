@@ -11,7 +11,7 @@ trait ResponseTrait {
         bool $success,
         string $message,
         int $statusCode,
-        ?array $data = null
+        mixed $data = null
     ): Response {
         
         $responseData = [
