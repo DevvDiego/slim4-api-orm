@@ -3,6 +3,7 @@
 require __DIR__ . "/../vendor/autoload.php";
 
 use App\Auth\JWTManager;
+use App\Middleware\ValidationMiddleware;
 use Slim\Factory\AppFactory;
 
 Dotenv\Dotenv::createImmutable(__DIR__ . '/..')->load();
@@ -16,7 +17,7 @@ $app = AppFactory::create();
 // $app->setBasePath('');
 
 $app->addBodyParsingMiddleware();
-$app->addErrorMiddleware(true, false, false);
+$app->addErrorMiddleware(true, true, true);
 
 // CORS middleware
 $app->add(function ($request, $handler) {
@@ -181,6 +182,9 @@ $app->add(function ($request, $handler) {
 
 $app->get('/tickets/{id}', \App\Controllers\TicketController::class . ':showTicket');
  */
+
+$app->post('/users', \App\Controllers\UserController::class . ":new")
+    ->add(new ValidationMiddleware(["name", "email", "password", "role"]));
 
 $app->get('/db', \App\Database\SchemaManager::class . ":sync");
 
