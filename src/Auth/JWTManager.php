@@ -33,13 +33,15 @@ class JWTManager{
         $issuedAt = time();
         $expire = $issuedAt + ($this->expiryHours * 3600);
         
+        // How could i use the role?
+
         $payload = array_merge([
             'iss' => $_SERVER['HTTP_HOST'] ?? 'localhost',  // Emisor (tu dominio)
             'iat' => $issuedAt,         // Fecha de emision
             'exp' => $expire,           // Fecha de expiracion
             'sub' => $userId,           // Sujeto (ID usuario)
-            'role' => 'admin',          // Rol
-            'jti' => bin2hex(random_bytes(16)) // ID unico del token
+            /* 'role' => 'admin',          // Rol */
+            'jti' => bin2hex(random_bytes(16)) // ID unico del token (Deberia almacenarlo??)
 
         ], $additionalData);
         
