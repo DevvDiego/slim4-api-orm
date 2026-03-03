@@ -46,7 +46,7 @@ class AuthMiddleware{
 
         $response = $this->error(
                 res:new Response(), 
-                msg:"Unauthorized"
+                msg:$message
             );
 
         return $response
