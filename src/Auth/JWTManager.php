@@ -29,21 +29,18 @@ class JWTManager{
     /**
      * Crea un token JWT para el usuario
     */
-    public function createToken(string $userId, array $additionalData = []): string{
+    public function createToken(\App\Models\User $user): string{
         $issuedAt = time();
         $expire = $issuedAt + ($this->expiryHours * 3600);
-        
-        // How could i use the role?
 
-        $payload = array_merge([
-            'iss' => $_SERVER['HTTP_HOST'] ?? 'localhost',  // Emisor (tu dominio)
-            'iat' => $issuedAt,         // Fecha de emision
-            'exp' => $expire,           // Fecha de expiracion
-            'sub' => $userId,           // Sujeto (ID usuario)
-            /* 'role' => 'admin',          // Rol */
-            'jti' => bin2hex(random_bytes(16)) // ID unico del token (Deberia almacenarlo??)
-
-        ], $additionalData);
+        $payload = [
+            'iat'  => $issuedAt,
+            'exp'  => $expire,
+            'sub'  => $user->id,
+            'jti'  => bin2hex(random_bytes(16)), // Gen un id unico del token
+            //'role' => $user->role,             
+            'email'=> $user->email               
+        ];
         
         return JWT::encode($payload, $this->secret, $this->algorithm);
     }
