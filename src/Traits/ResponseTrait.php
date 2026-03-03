@@ -36,7 +36,7 @@ trait ResponseTrait {
         Response $res, 
         mixed $data = null, 
         string $msg = "Success", 
-        int $code = 200
+        int $code = 400
     ): Response {
 
         return $this->json($res, $code, [
