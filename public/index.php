@@ -31,28 +31,22 @@ $app->add(function ($request, $handler) {
 
 
 
-$app->group('/admin', function ($group) {
+//Auth middleware injects the decoded token in the request here
+$app->group('/admin', function ($group){
 
 
+    $group->post('/verify', function (\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
+        $tokenData = $request->getAttribute('user');
 
-   /*  $group->post('/verify', function (Request $request, Response $response, array $args) {
-        try {            
-        
-            // the simple fact of a request reaching this point,
-            // means it passed the auth middlewate, therefore the token is valid.
+        // Cambia el acceso de flecha -> por corchetes []
+        $userId = $tokenData->sub;
+        $response->getBody()->write(json_encode([
+            "message" => "Valid token",
+            "user_id" => $userId,
+        ]));
 
-            return ResponseHelper::success(
-                "Valid token"
-            );
-                
-        } catch(\Exception $e) {
-
-            return ResponseHelper::error(
-                $e->getMessage()
-            );
-
-        }
-    }); */
+        return $response->withHeader('Content-Type', 'application/json');
+    });
 
 
 

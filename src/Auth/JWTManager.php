@@ -7,6 +7,7 @@ use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 use DomainException;
+use stdClass;
 use UnexpectedValueException;
 
 class JWTManager{
@@ -49,10 +50,10 @@ class JWTManager{
     /**
      * Valida y decodifica un token JWT
     */
-    public function validateToken(string $token): ?array{
+    public function validateToken(string $token): ?stdClass{
         try {
             $decoded = JWT::decode($token, new Key($this->secret, $this->algorithm));
-            return (array) $decoded;
+            return $decoded;
 
         } catch (ExpiredException $e) {
             // Token expirado
