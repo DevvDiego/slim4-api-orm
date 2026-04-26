@@ -4,6 +4,7 @@ namespace App\Middleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
 use \App\Auth\JWTManager as JWTManager;
+use \App\Auth\Auth as Auth;
 use Slim\Psr7\Response;
 
 use App\Traits\ResponseTrait;
@@ -35,8 +36,7 @@ class AuthMiddleware{
 
         }
         
-        // Añadir informacion del usuario a la request
-        $request = $request->withAttribute('user', $payload);
+        Auth::setUser($payload);
         
         // Continuar con la ejecución
         return $handler->handle($request);

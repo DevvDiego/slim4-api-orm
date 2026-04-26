@@ -39,7 +39,7 @@ class JWTManager{
             'exp'  => $expire,
             'sub'  => $user->id,
             'jti'  => bin2hex(random_bytes(16)), // Gen un id unico del token
-            //'role' => $user->role,             
+            'role' => $user->role,             
             'email'=> $user->email               
         ];
         

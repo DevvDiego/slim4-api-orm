@@ -35,14 +35,12 @@ $app->add(function ($request, $handler) {
 $app->group('/admin', function ($group){
 
 
-    $group->post('/verify', function (\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
-        $tokenData = $request->getAttribute('user');
-
-        // Cambia el acceso de flecha -> por corchetes []
-        $userId = $tokenData->sub;
+    $group->get('/verify', function (\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
+        $user = \App\Auth\Auth::user();
+        
         $response->getBody()->write(json_encode([
-            "message" => "Valid token",
-            "user_id" => $userId,
+            "message" => "Hola {$user->email}, tu ID es {$user->sub}",
+            "role"    => $user->role ?? null
         ]));
 
         return $response->withHeader('Content-Type', 'application/json');
