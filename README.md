@@ -92,6 +92,92 @@ The payload contains the user's role, making it easy to implement role-specific 
 - **HTTPS** is strongly recommended in production to prevent token interception.
 - **CORS** is configurable via `.env` variables (`ALLOWED_ORIGINS`, `ALLOWED_HEADERS`, `ALLOWED_METHODS`).
 
+---
+
+## Database Migrations (Route-based)
+
+Unlike traditional migration systems (like Laravel's Artisan or Phinx), this API implements a **simplified, route-driven migration system** that runs directly from an HTTP endpoint.
+
+### How it works
+
+The endpoint `/admin/db` (protected by authentication) triggers the `SchemaManager::sync()` method, which:
+
+1. **Disables foreign key constraints** temporarily to avoid conflicts during table creation.
+2. **Checks for missing tables** – For each model (users, customers, tickets, etc.), it verifies if the corresponding table exists.
+3. **Creates missing tables** – If a table doesn't exist, it calls the table's schema class to build it.
+4. **Applies column updates** – The `updateTables()` method checks for new columns that need to be added to existing tables.
+5. **Re-enables foreign key constraints** – Regardless of success or failure.
+
+### Schema definition pattern
+
+Each entity has its own schema class that defines the table structure:
+
+### Column evolution with `alter()` helper
+
+When you need to add a new column to an existing table, you don't rebuild the whole table. Instead, you add it to the `updateTables()` method:
+
+```php
+private function updateTables(): int {
+    $updatesCount = 0;
+    
+    // Adding a 'phone' column to 'users' table
+    $updatesCount += (int) $this->alter('users', 'phone', function($table) {
+        $table->string('phone', 20)->nullable();
+    });
+    
+    // Adding a 'priority' column to 'tickets' table
+    $updatesCount += (int) $this->alter('tickets', 'priority', function($table) {
+        $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
+    });
+    
+    return $updatesCount;
+}
+```
+
+The `alter()` method:
+- Checks if the table exists before attempting modifications.
+- Checks if the column already exists (to avoid duplication).
+- Applies the callback only if both conditions are met.
+
+### Response example
+
+**Success (created new tables):**
+```json
+{
+    "status": "success",
+    "message": "Tables created: users, customers. Applied 2 new columns"
+}
+```
+
+**Success (everything up to date):**
+```json
+{
+    "status": "success", 
+    "message": "Tables created: . Applied 0 new columns"
+}
+```
+
+**Error:**
+```json
+{
+    "status": "error",
+    "message": "Error creating tables: Base table or view already exists"
+}
+```
+
+### Advantages of this approach
+
+- **No CLI required** – Perfect for shared hosting environments without command-line access.
+- **Idempotent** – Running it multiple times only creates missing tables and adds new columns.
+- **Self-contained** – Database structure is versioned alongside the application code.
+- **Easy to test** – You can programmatically trigger migrations in test suites.
+
+### Limitations (and why they're acceptable for this use case)
+
+- No rollback support (for learning/development scenarios, you can manually drop tables).
+- Sequential execution only (not a bottleneck for small to medium projects).
+- No migration history table (but you can easily add one if needed).
+
 
 ## 🤝 Contributions
 
