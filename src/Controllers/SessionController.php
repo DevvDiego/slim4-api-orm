@@ -13,13 +13,7 @@ class SessionController {
         // Auth::user() ya fue seteado por el middleware
         $user = Auth::user();
         
-        if (!$user) {
-            return $this->error(
-                res: $response,
-                msg: "No authenticated session",
-                code: 401
-            );
-        }
+        // we dont process the user auth, just format session data
 
         return $this->success(
             res: $response,

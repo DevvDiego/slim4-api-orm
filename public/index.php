@@ -48,8 +48,8 @@ $app->group('/admin', function ($group) use ($app){
 })->add(\App\Middleware\AuthMiddleware::class);
 
 
-$app->get("/session", \App\Controllers\SessionController::class . ":show");
-
+$app->get("/session", \App\Controllers\SessionController::class . ":show")
+    ->add(\App\Middleware\AuthMiddleware::class);
 
 
 
