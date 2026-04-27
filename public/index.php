@@ -35,15 +35,7 @@ $app->add(function ($request, $handler) {
 $app->group('/admin', function ($group) use ($app){
 
 
-    // $group->get('/verify', function (\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
-    //     $user = \App\Auth\Auth::user();
-        
-    //     $response->getBody()->write(json_encode([
-    //         "message" => "Hola {$user->email}, tu ID es {$user->sub}",
-    //         "role"    => $user->role ?? null
-    //     ]));
-
-    //     return $response->withHeader('Content-Type', 'application/json');
+    $app->get('/db', \App\Database\SchemaManager::class . ":sync");
 
 })->add(\App\Middleware\AuthMiddleware::class);
 
@@ -66,7 +58,7 @@ $app->get('/tickets/{id}', \App\Controllers\TicketController::class . ':showTick
 $app->post('/users', \App\Controllers\UserController::class . ":new")
     ->add(new ValidationMiddleware(["name", "email", "password", "role"]));
 
-$app->get('/db', \App\Database\SchemaManager::class . ":sync");
+
 
 
 $app->run();
