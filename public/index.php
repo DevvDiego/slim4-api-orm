@@ -53,10 +53,11 @@ $app->post('/login', \App\Controllers\AuthController::class . ":login")
 /* $app->get('/users/{id}', \App\Controllers\UserController::class . ':showUser');
 
 $app->get('/tickets/{id}', \App\Controllers\TicketController::class . ':showTicket');
- */
 
+// the creation of users should not be public
 $app->post('/users', \App\Controllers\UserController::class . ":new")
     ->add(new ValidationMiddleware(["name", "email", "password", "role"]));
+ */
 
 
 
