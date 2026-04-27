@@ -87,8 +87,8 @@ class JWTManager{
         }
         
         // Crear nuevo token con misma información
-        return $this->createToken($payload['sub'], [
-            'role' => $payload['role'] ?? 'admin'
+        return $this->createToken($payload["sub"], [
+            "role" => $payload["role"] ?? "user"
         ]);
     }
 }
