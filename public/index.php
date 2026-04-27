@@ -32,24 +32,26 @@ $app->add(function ($request, $handler) {
 
 
 //Auth middleware injects the decoded token in the request here
-$app->group('/admin', function ($group){
+$app->group('/admin', function ($group) use ($app){
 
 
-    $group->get('/verify', function (\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
-        $user = \App\Auth\Auth::user();
+    // $group->get('/verify', function (\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
+    //     $user = \App\Auth\Auth::user();
         
-        $response->getBody()->write(json_encode([
-            "message" => "Hola {$user->email}, tu ID es {$user->sub}",
-            "role"    => $user->role ?? null
-        ]));
+    //     $response->getBody()->write(json_encode([
+    //         "message" => "Hola {$user->email}, tu ID es {$user->sub}",
+    //         "role"    => $user->role ?? null
+    //     ]));
 
-        return $response->withHeader('Content-Type', 'application/json');
-    });
-
-
-
+    //     return $response->withHeader('Content-Type', 'application/json');
 
 })->add(\App\Middleware\AuthMiddleware::class);
+
+
+$app->get("/session", \App\Controllers\SessionController::class . ":show");
+
+
+
 
 
 $app->post('/login', \App\Controllers\AuthController::class . ":login")
