@@ -18,6 +18,9 @@ class SchemaManager {
         $this->db = $db;
     }
 
+    /**
+     * Simpler implementation to handle database migrations via routes (Similar to Artisan)
+     */
     public function sync(Request $request, Response $response, array $args): Response {
         $this->db::schema()->disableForeignKeyConstraints();
         $createdTables = [];
