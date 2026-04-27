@@ -1,7 +1,8 @@
-## Barebones API REST Template
-This template was made with the idea of being easy to modify for small projects, no large dependencies and simple structure.
+## API RESTFul with Slim 4 
 
-There will be another version which will make use of Dependency injection and Eloquent ORM, still simple but more complete for a real use case.
+This template is made with the idea of being easy to modify for small projects, includes Eloquent ORM and authentication via JWT
+
+If you want a even **simpler template** look at [slim4-api-min](https://github.com/devvdiego/slim4-api-min)
 
 ## Quick start guide
 
@@ -48,13 +49,48 @@ php -r "echo bin2hex(random_bytes(32));"
 ---
 
 
-## 🔐 Security and Auth
+## 🔐 Security and Authentication
 
-### Single-Admin management
+### JWT-based Authentication (Stateless)
 
-To simplify the API and maximize reutilization, it's designed under a model of **Single-Admin**.
-* **No register routes:** There does not exist any route to register users
-* **Hash Authentication:** Admin access is managed by a sigle direct password hash that should be stored in the configured `.env` variable.
+The API implements **stateless authentication** using **JSON Web Tokens (JWT)**. This allows multiple users with different roles to authenticate and interact with the API.
+
+### How it works
+
+1. **User registration** – New users can be created via `POST /users` (public endpoint).
+2. **Login** – `POST /login` receives email/password, validates credentials, and returns a JWT.
+3. **Token usage** – The client must include the token in subsequent requests:
+   ```
+   Authorization: Bearer <jwt_token>
+   ```
+4. **Authentication middleware** – Protected routes include `AuthMiddleware`, which validates the token and loads the authenticated user into the static `Auth::user()` class.
+5. **Session info** – `GET /session` returns the currently authenticated user's data (id, email, role, expiration).
+
+### Password hashing
+
+All passwords are securely hashed using PHP's native `password_hash()` with the default BCRYPT algorithm. Verification is done via `password_verify()`.
+
+### Accessing the authenticated user
+
+Anywhere after the middleware (controllers, services, repositories), you can retrieve the current user via:
+
+```php
+use App\Auth\Auth;
+
+$user = Auth::user(); // stdClass with sub, email, data->role, etc.
+$userId = Auth::id();
+$userEmail = Auth::email();
+```
+
+### Role-based access control – (Planned)
+
+The payload contains the user's role, making it easy to implement role-specific middleware. Example (to be implemented):
+
+### Security considerations
+
+- **JWT secret** must be at least 32 characters long and stored in `.env` (`JWT_SECRET`).
+- **HTTPS** is strongly recommended in production to prevent token interception.
+- **CORS** is configurable via `.env` variables (`ALLOWED_ORIGINS`, `ALLOWED_HEADERS`, `ALLOWED_METHODS`).
 
 
 ## 🤝 Contributions
