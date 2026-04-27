@@ -51,20 +51,21 @@ php -r "echo bin2hex(random_bytes(32));"
 
 ## 🔐 Security and Authentication
 
-### JWT-based Authentication (Stateless)
+### Admin-only API
 
-The API implements **stateless authentication** using **JSON Web Tokens (JWT)**. This allows multiple users with different roles to authenticate and interact with the API.
+The API is designed for **internal administration only**. All authenticated users are administrators by default. Therefore, there is no public user creation route
 
-### How it works
+### Role enforcement
 
-1. **User registration** – New users can be created via `POST /users` (public endpoint).
-2. **Login** – `POST /login` receives email/password, validates credentials, and returns a JWT.
-3. **Token usage** – The client must include the token in subsequent requests:
-   ```
-   Authorization: Bearer <jwt_token>
-   ```
-4. **Authentication middleware** – Protected routes include `AuthMiddleware`, which validates the token and loads the authenticated user into the static `Auth::user()` class.
-5. **Session info** – `GET /session` returns the currently authenticated user's data (id, email, role, expiration).
+Since the application only manages admin accounts But there is no distinction between "authenticated user" and "admin user" for the api, they are the same.
+
+If you ever need to introduce regular users in the future, you can extract the role check into a separate `RoleMiddleware`.
+
+
+### Role-based access control – (Planned)
+
+The payload contains the user's role, making it easy to implement role-specific middleware. (to be implemented):
+
 
 ### Password hashing
 
@@ -72,7 +73,7 @@ All passwords are securely hashed using PHP's native `password_hash()` with the 
 
 ### Accessing the authenticated user
 
-Anywhere after the middleware (controllers, services, repositories), you can retrieve the current user via:
+Anywhere after the middleware, you can retrieve the current user via:
 
 ```php
 use App\Auth\Auth;
@@ -82,9 +83,6 @@ $userId = Auth::id();
 $userEmail = Auth::email();
 ```
 
-### Role-based access control – (Planned)
-
-The payload contains the user's role, making it easy to implement role-specific middleware. Example (to be implemented):
 
 ### Security considerations
 
